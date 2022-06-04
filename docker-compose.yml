@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  dbService:
+    container_name: mariadb
+    image: mariadb:latest
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - ~/apps/mariadb:/var/lib/mysql
