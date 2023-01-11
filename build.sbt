@@ -2,10 +2,6 @@ name := "MedWalletBackend"
 version := "0.1"
 scalaVersion := "2.13.10"
 
-name := "medWallet"
-version := "0.1"
-scalaVersion := "2.13.10"
-
 //modules
 lazy val container = project
   .in(file("."))
