@@ -4,7 +4,7 @@ scalaVersion := "2.13.10"
 
 //modules
 lazy val container = project
-  .in(file("."))
+  .in(file("./container"))
   .aggregate(domain, persistence, infrastructure)
   .settings(
     name := "container",
