@@ -1,3 +1,5 @@
 package pt.med.wallet
 
-abstract class AggregateRoot[A <: Entity[_], B <: Id[_]]
+trait AggregateRoot { self: Entity[Id[_]] =>
+  
+}
