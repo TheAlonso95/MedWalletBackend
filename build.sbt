@@ -24,7 +24,7 @@ lazy val domain_core = project
   .dependsOn()
   .settings(
     name := "domain-core",
-    libraryDependencies ++= Seq()
+    libraryDependencies ++= Seq("com.github.pureconfig" %% "pureconfig" % "0.17.2")
   )
 
 lazy val domain_application = project
