@@ -2,6 +2,8 @@ name := "AuthService"
 version := "0.1"
 scalaVersion := "2.13.10"
 
+val logbackVersion = "1.4.6"
+
 //modules
 lazy val container = project
   .in(file("./container"))
@@ -15,7 +17,7 @@ lazy val common = project
   .in(file("./common"))
   .settings(
     name := "common",
-    libraryDependencies ++= Seq()
+    libraryDependencies ++= Seq("ch.qos.logback" % "logback-classic" % logbackVersion)
   )
 
 lazy val domain = project
