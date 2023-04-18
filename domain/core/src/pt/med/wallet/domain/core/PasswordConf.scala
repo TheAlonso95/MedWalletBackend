@@ -22,8 +22,8 @@ object PasswordConf {
 
   def load: PasswordConf = ConfigSource.default.load[PasswordConf] match {
     case Left(failures) =>
-      logger.error("Password configuration failed to load", ConfigException(failures.prettyPrint))
-      ConfigException(failures.prettyPrint)
+      logger.error("Password configuration failed to load", ConfigException(failures.prettyPrint()))
+      throw ConfigException(failures.prettyPrint())
     case Right(config) =>
       logger.info("Password configurations were set with success")
       config

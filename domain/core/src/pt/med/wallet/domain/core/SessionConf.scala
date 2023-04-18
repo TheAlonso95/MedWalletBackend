@@ -22,6 +22,6 @@ object SessionConf {
   private val logger: Logger = LoggerFactory.getLogger(getClass.getName)
   def load: SessionConf = ConfigSource.default.load[SessionConf].getOrElse {
     logger.warn("SessionConf was set with default values")
-    new SessionConf()
+    SessionConf()
   }
 }
