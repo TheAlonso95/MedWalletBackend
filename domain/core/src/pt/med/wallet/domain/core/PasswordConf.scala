@@ -4,6 +4,7 @@ import pureconfig._
 import pureconfig.generic.auto._
 import org.slf4j.LoggerFactory
 import org.slf4j.Logger
+import pt.med.wallet.domain.core.exceptions.ConfigException
 
 
 case class PasswordConf(minLength: Short = 0,
@@ -21,8 +22,8 @@ object PasswordConf {
 
   def load: PasswordConf = ConfigSource.default.load[PasswordConf] match {
     case Left(failures) =>
-      logger.error("Password configuration failed to load", PasswordConfException(failures.prettyPrint))
-      PasswordConfException(failures.prettyPrint)
+      logger.error("Password configuration failed to load", ConfigException(failures.prettyPrint))
+      ConfigException(failures.prettyPrint)
     case Right(config) =>
       logger.info("Password configurations were set with success")
       config
