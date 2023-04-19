@@ -13,7 +13,7 @@ case class PasswordConf(minLength: Short = 0,
                         withLowerCase: Boolean = false,
                         withNumbers: Boolean = false,
                         withSymbols: Boolean = false,
-                        secretKey: Long
+                        secretKey: String
                        )
 
 object PasswordConf {
