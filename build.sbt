@@ -3,6 +3,7 @@ version := "0.1"
 scalaVersion := "2.13.10"
 
 val logbackVersion = "1.4.6"
+val scalatestVersion = "3.2.15"
 
 //modules
 lazy val container = project
@@ -17,7 +18,10 @@ lazy val common = project
   .in(file("./common"))
   .settings(
     name := "common",
-    libraryDependencies ++= Seq("ch.qos.logback" % "logback-classic" % logbackVersion)
+    libraryDependencies ++= Seq(
+      "ch.qos.logback" % "logback-classic" % logbackVersion,
+      "org.scalatest" %% "scalatest" % scalatestVersion % "test"
+    )
   )
 
 lazy val domain = project
