@@ -1,6 +1,7 @@
 package pt.med.wallet.domain.core.entities
 
 import pt.med.wallet.Entity
+import pt.med.wallet.domain.core.SessionConf
 import pt.med.wallet.domain.core.valueobjects.{Email, SessionId}
 
 import java.time.LocalDateTime
@@ -13,10 +14,11 @@ case class Session(sessionId: SessionId, token: String, expirationDate: LocalDat
 }
 
 object Session {
-  def generateSession(email: Email): Session = {
+  def generateSession(email: Email)(implicit config: SessionConf): Session = {
     val id = UUID.randomUUID()
     val token = Base64.getEncoder.encodeToString(s"$email-token-$id".getBytes)
-    val expirationAt = LocalDateTime.now().plusHours(24)
+    val expirationConfig = config.expirationTime
+    val expirationAt = LocalDateTime.now().plus(expirationConfig.length, expirationConfig.unit.toChronoUnit)
     Session(new SessionId(id), token, expirationAt)
   }
 }
