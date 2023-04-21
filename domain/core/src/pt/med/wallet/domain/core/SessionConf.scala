@@ -10,7 +10,6 @@ import scala.language.postfixOps
 
 case class SessionConf(
                         cookieName: String = "session_id",
-                        secretKey: String = "my_secret_key",
                         expirationTime: FiniteDuration = 30 minutes,
                         cookiePath: String = "/",
                         cookieDomain: Option[String] = None,
