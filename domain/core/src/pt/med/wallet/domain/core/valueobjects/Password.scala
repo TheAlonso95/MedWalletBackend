@@ -8,37 +8,59 @@ import javax.crypto.spec.SecretKeySpec
 import javax.crypto.Cipher
 import java.util.Base64
 
-case class Password(password: String)(implicit config: PasswordConf) extends ValueObject[String](password) {
+abstract class Password(password: String)(implicit config: PasswordConf) extends ValueObject[String](password) {
+  final val UTF_8: String = "UTF-8"
   private val algorithm = "AES"
   private val transformation = s"$algorithm/ECB/PKCS5Padding"
   private val keySize = 256
 
-  def encrypt: Password = {
-    val cipher = Cipher.getInstance(transformation)
-    val key = new SecretKeySpec(config.secretKey.getBytes("UTF-8"), 0, keySize / 8, algorithm)
+  val cipher: Cipher = Cipher.getInstance(transformation)
+  val key = new SecretKeySpec(config.secretKey.getBytes(UTF_8), 0, keySize / 8, algorithm)
 
-    cipher.init(Cipher.ENCRYPT_MODE, key)
+  def encrypt: Password
 
-    val encryptedBytes = cipher.doFinal(password.getBytes("UTF-8"))
+  def decrypt: Password
 
-    this.copy(Base64.getEncoder.encodeToString(encryptedBytes))
-  }
+  def isEncrypted: Boolean
+}
 
-  def decrypt(secret: String, cipherText: String): Password = {
-    val cipher = Cipher.getInstance(transformation)
-    val key = new SecretKeySpec(secret.getBytes("UTF-8"), 0, keySize / 8, algorithm)
+final case class Encrypted(password: String)(implicit config: PasswordConf) extends Password(password) {
+  override def encrypt: Password =
+    throw new IllegalAccessError("You can not encrypt this password since is already encrypted")
+
+  override def decrypt: Password = {
 
     cipher.init(Cipher.DECRYPT_MODE, key)
 
-    val encryptedBytes = Base64.getDecoder.decode(cipherText)
-    this.copy(new String(cipher.doFinal(encryptedBytes), "UTF-8"))
+    val encryptedBytes = Base64.getDecoder.decode(password)
+
+    Decrypted(new String(cipher.doFinal(encryptedBytes), UTF_8))
   }
 
+  override def isEncrypted: Boolean = true
+}
+
+case class Decrypted(password: String)(implicit config: PasswordConf) extends Password(password) {
+
+  override def encrypt: Password = {
+
+    cipher.init(Cipher.ENCRYPT_MODE, key)
+
+    val encryptedBytes = cipher.doFinal(password.getBytes(UTF_8))
+
+    Encrypted(Base64.getEncoder.encodeToString(encryptedBytes))
+  }
+
+  override def decrypt: Password =
+    throw new IllegalAccessError("You can not decrypt this password since is already decrypted")
+
+  override def isEncrypted: Boolean = false
 }
 
 object Password {
-  def apply(password: String)(implicit config: PasswordConf): Password = {
-    if(isPasswordValid(password, config)) new Password(password)
+  def apply(password: String, isEncrypted: Boolean = false)(implicit config: PasswordConf): Password = {
+    if (isPasswordValid(password, config))
+      if (isEncrypted) Encrypted(password) else Decrypted(password)
     else throw PasswordException(s"The password: $password is not valid for the current password configuration")
   }
 
