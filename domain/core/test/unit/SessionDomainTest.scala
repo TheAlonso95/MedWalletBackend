@@ -1,4 +1,5 @@
 package unit
+
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers._
 import pt.med.wallet.domain.core.SessionConf
@@ -12,6 +13,7 @@ import java.util.Base64
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
+
 class SessionDomainTest extends AnyFlatSpec with should.Matchers with ConfigResources {
   val validEmail: Email = Email("med@domain.com")
   lazy val session: Session = Session.generateSession(validEmail)
