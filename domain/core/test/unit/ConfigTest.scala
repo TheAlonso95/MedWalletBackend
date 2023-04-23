@@ -1,6 +1,5 @@
 package unit
 
-import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 import pt.med.wallet.domain.core.exceptions.ConfigException
