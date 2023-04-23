@@ -12,10 +12,9 @@ abstract class Password(password: String)(implicit config: PasswordConf) extends
   final val UTF_8: String = "UTF-8"
   private val algorithm = "AES"
   private val transformation = s"$algorithm/ECB/PKCS5Padding"
-  private val keySize = 256
 
   val cipher: Cipher = Cipher.getInstance(transformation)
-  val key = new SecretKeySpec(config.secretKey.getBytes(UTF_8), 0, keySize / 8, algorithm)
+  val key = new SecretKeySpec(config.secretKey.getBytes(UTF_8), algorithm)
 
   def encrypt: Password
 
