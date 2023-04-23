@@ -7,4 +7,6 @@ abstract class ValueObject[A](val field: A) {
     case other: ValueObject[_] => field == other.field
     case _ => false
   }
+
+  override def toString: String = s"$field"
 }
