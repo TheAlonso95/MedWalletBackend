@@ -1,6 +1,6 @@
 package pt.med.wallet
 
-abstract class ValueObject[A](field: A) {
+abstract class ValueObject[A](val field: A) {
   override def hashCode(): Int = field.hashCode()
 
   override def equals(obj: Any): Boolean = obj match {

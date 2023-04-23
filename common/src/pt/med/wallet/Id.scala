@@ -1,6 +1,6 @@
 package pt.med.wallet
 
-abstract class Id[A](id: A) extends ValueObject[A](id) {
+abstract class Id[A](val id: A) extends ValueObject[A](id) {
   override def hashCode(): Int = id.hashCode()
 
   override def equals(obj: Any): Boolean = obj match {
