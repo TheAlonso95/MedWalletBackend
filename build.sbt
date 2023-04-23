@@ -20,7 +20,7 @@ lazy val common = project
     name := "common",
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % logbackVersion,
-      "org.scalatest" %% "scalatest" % scalatestVersion % "test"
+      "com.github.pureconfig" %% "pureconfig" % "0.17.2"
     )
   )
 
@@ -36,7 +36,10 @@ lazy val domain_core = project
   .dependsOn(common)
   .settings(
     name := "domain-core",
-    libraryDependencies ++= Seq("com.github.pureconfig" %% "pureconfig" % "0.17.2")
+    libraryDependencies ++= Seq(
+      "com.github.pureconfig" %% "pureconfig" % "0.17.2",
+      "org.scalatest" %% "scalatest" % scalatestVersion % "test"
+    )
   )
 
 lazy val domain_application = project
