@@ -1,12 +1,14 @@
 package pt.med.wallet.domain.core.valueobjects
 
+import org.slf4j.{Logger, LoggerFactory}
 import pt.med.wallet.ValueObject
 import pt.med.wallet.domain.core.PasswordConf
-import pt.med.wallet.domain.core.exceptions.PasswordException
+import pt.med.wallet.domain.core.exceptions.{PasswordException, DecryptPasswordException, EncryptPasswordException}
 
 import javax.crypto.spec.SecretKeySpec
 import javax.crypto.Cipher
 import java.util.Base64
+import scala.util.{Failure, Success, Try}
 
 abstract class Password(password: String)(implicit config: PasswordConf) extends ValueObject[String](password) {
   final val UTF_8: String = "UTF-8"
@@ -24,16 +26,27 @@ abstract class Password(password: String)(implicit config: PasswordConf) extends
 }
 
 final case class Encrypted(password: String)(implicit config: PasswordConf) extends Password(password) {
+
+  import Password._
+
   override def encrypt: Password =
     throw new IllegalAccessError("You can not encrypt this password since is already encrypted")
 
   override def decrypt: Password = {
-
-    cipher.init(Cipher.DECRYPT_MODE, key)
-
-    val encryptedBytes = Base64.getDecoder.decode(password)
-
-    Decrypted(new String(cipher.doFinal(encryptedBytes), UTF_8))
+    logger.info(s"Starting the process of decrypting the password: $password")
+    Try {
+      cipher.init(Cipher.DECRYPT_MODE, key)
+      val encryptedBytes = Base64.getDecoder.decode(password)
+      val decryptedPassword = new String(cipher.doFinal(encryptedBytes), UTF_8)
+      Decrypted(decryptedPassword)
+    } match {
+      case Failure(exception) =>
+        logger.error(s"Decrypt process failed to decrypt password because of: ${exception.getMessage}")
+        throw DecryptPasswordException(s"Decrypt process failed to decrypt password because of: ${exception.getMessage}")
+      case Success(password) =>
+        logger.info("Decrypt process was finished with success")
+        password
+    }
   }
 
   override def isEncrypted: Boolean = true
@@ -41,13 +54,23 @@ final case class Encrypted(password: String)(implicit config: PasswordConf) exte
 
 case class Decrypted(password: String)(implicit config: PasswordConf) extends Password(password) {
 
+  import Password._
+
   override def encrypt: Password = {
-
-    cipher.init(Cipher.ENCRYPT_MODE, key)
-
-    val encryptedBytes = cipher.doFinal(password.getBytes(UTF_8))
-
-    Encrypted(Base64.getEncoder.encodeToString(encryptedBytes))
+    logger.info(s"Starting the process of encrypting the password")
+    Try {
+      cipher.init(Cipher.ENCRYPT_MODE, key)
+      val encryptedBytes = cipher.doFinal(password.getBytes(UTF_8))
+      val encodedPassword = Base64.getEncoder.encodeToString(encryptedBytes)
+      Encrypted(encodedPassword)
+    } match {
+      case Failure(exception) =>
+        logger.error(s"Encrypt process failed to decrypt password because of: ${exception.getMessage}")
+        throw EncryptPasswordException(s"Encrypt process failed to decrypt password because of: ${exception.getMessage}")
+      case Success(encryptedPassword) =>
+        logger.info(s"Encrypt process was finished with success, new password value: $encryptedPassword")
+        encryptedPassword
+    }
   }
 
   override def decrypt: Password =
@@ -57,7 +80,11 @@ case class Decrypted(password: String)(implicit config: PasswordConf) extends Pa
 }
 
 object Password {
+
+  val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+
   def apply(password: String, isEncrypted: Boolean = false)(implicit config: PasswordConf): Password = {
+
     if (isPasswordValid(password, config))
       if (isEncrypted) Encrypted(password) else Decrypted(password)
     else throw PasswordException(s"The password: $password is not valid for the current password configuration")
