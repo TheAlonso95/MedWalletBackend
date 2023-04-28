@@ -1,12 +1,20 @@
 package pt.med.wallet.domain.application.dtos
 
+import org.joda.time.LocalDateTime
 import pt.med.wallet.domain.core.PasswordConf
 import pt.med.wallet.domain.core.entities.Account
 import pt.med.wallet.domain.core.valueobjects.{AccountId, Email, Password}
 
 import java.util.UUID
 
-case class AccountDTO(accountId: UUID, email: String, password: String, session: Option[SessionDTO] = None) {
+case class AccountDTO(
+                       accountId: UUID,
+                       email: String,
+                       password: String,
+                       session: Option[SessionDTO] = None,
+                       createdAt: Option[LocalDateTime] = None,
+                       updatedAt: Option[LocalDateTime] = None
+                     ) {
   def toAccount(implicit config: PasswordConf): Account =
     Account(new AccountId(accountId), Email(email), Password(password), session.map(_.toSession))
 }

@@ -6,7 +6,7 @@ import pt.med.wallet.domain.core.valueobjects.SessionId
 import java.time.LocalDateTime
 import java.util.UUID
 
-case class SessionDTO(sessionId: UUID, token: String, expirationDate: LocalDateTime) {
+case class SessionDTO(sessionId: UUID, token: String, expirationDate: LocalDateTime, createAt: Option[LocalDateTime] = None) {
   def toSession: Session = Session(new SessionId(sessionId), token, expirationDate)
 }
 
