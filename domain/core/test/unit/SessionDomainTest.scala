@@ -4,19 +4,20 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers._
 import pt.med.wallet.domain.core.SessionConf
 import pt.med.wallet.domain.core.entities.Session
-import pt.med.wallet.domain.core.valueobjects.Email
+import pt.med.wallet.domain.core.valueobjects.{AccountId, Email}
 import util.ConfigResources
 
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.Base64
-
+import java.util.{Base64, UUID}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class SessionDomainTest extends AnyFlatSpec with should.Matchers with ConfigResources {
   val validEmail: Email = Email("med@domain.com")
-  lazy val session: Session = Session.generateSession(validEmail)
+  val validAccountId: AccountId = new AccountId( UUID.fromString("e1f5a481-91d5-4449-b76d-173d7c49851c"))
+
+  lazy val session: Session = Session.generateSession(validEmail, validAccountId)
 
   "For a valid email a session" should "be generated containing the correct data of the email on the token" in {
     val decodedToken = new String(Base64.getDecoder.decode(session.token))
@@ -32,7 +33,7 @@ class SessionDomainTest extends AnyFlatSpec with should.Matchers with ConfigReso
   }
 
   "For a valid email a session" should "be generated containing the correct expiration date" in {
-    val expirationDate = Session.generateSession(validEmail).expirationDate
+    val expirationDate = session.expirationDate
     val expectedExpirationDate = LocalDateTime.now.plus(expirationConf.length, expirationConf.unit.toChronoUnit)
 
     val unitAffected = expirationConf.unit.toChronoUnit match {
@@ -47,14 +48,13 @@ class SessionDomainTest extends AnyFlatSpec with should.Matchers with ConfigReso
   }
 
   "For a valid email a session" should "be generated containing a valid token" in {
-    val session: Session = Session.generateSession(validEmail)
 
     session.isValid shouldBe true
   }
 
   "Id a session for a valid email expires than the token" should "not be valid anymore" in {
     val fakeSessionConf = new SessionConf(expirationTime = 1 second)
-    val expiredSession = Session.generateSession(validEmail)(fakeSessionConf)
+    val expiredSession = Session.generateSession(validEmail, validAccountId)(fakeSessionConf)
     val oneSecond = 1000
     Thread.sleep(oneSecond)
 
