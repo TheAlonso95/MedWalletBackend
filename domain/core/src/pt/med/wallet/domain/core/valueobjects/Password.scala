@@ -42,7 +42,7 @@ final case class Encrypted(password: String)(implicit config: PasswordConf) exte
     } match {
       case Failure(exception) =>
         logger.error(s"Decrypt process failed to decrypt password because of: ${exception.getMessage}")
-        throw DecryptPasswordException(s"Decrypt process failed to decrypt password because of: ${exception.getMessage}")
+        throw new DecryptPasswordException(s"Decrypt process failed to decrypt password because of: ${exception.getMessage}")
       case Success(password) =>
         logger.info("Decrypt process was finished with success")
         password
@@ -66,7 +66,7 @@ case class Decrypted(password: String)(implicit config: PasswordConf) extends Pa
     } match {
       case Failure(exception) =>
         logger.error(s"Encrypt process failed to decrypt password because of: ${exception.getMessage}")
-        throw EncryptPasswordException(s"Encrypt process failed to decrypt password because of: ${exception.getMessage}")
+        throw new EncryptPasswordException(s"Encrypt process failed to decrypt password because of: ${exception.getMessage}")
       case Success(encryptedPassword) =>
         logger.info(s"Encrypt process was finished with success, new password value: $encryptedPassword")
         encryptedPassword
