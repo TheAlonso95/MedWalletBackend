@@ -20,7 +20,7 @@ object Session {
   def generateSession(email: Email, accountId: AccountId)(implicit config: SessionConf): Session = {
     logger.info(s"Generating a session for email: $email")
     val id = UUID.randomUUID()
-    val token = Base64.getEncoder.encodeToString(s"$email-$accountId-token-$id".getBytes)
+    val token = Base64.getEncoder.encodeToString(s"$email/$accountId/token/$id".getBytes)
     logger.info(s"Encoded token: $token")
 
     val expirationConfig = config.expirationTime
