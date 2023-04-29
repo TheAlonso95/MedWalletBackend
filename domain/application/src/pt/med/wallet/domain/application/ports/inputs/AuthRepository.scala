@@ -8,11 +8,11 @@ trait AuthRepository {
 
   type Token = String
   type Empty = Unit
+
   def createAccount(account: AccountDTO): Future[Empty]
-  def updatePassword(accountDTO: AccountDTO)(newPassword: String): Future[Empty]
-  def updateEmail(accountDTO: AccountDTO)(newEmail: String): Future[Empty]
-  def deleteAccount(accountDTO: AccountDTO, isSoftDelete: Boolean = true): Future[Empty]
-  def suspendAccount(accountDTO: AccountDTO, reasons: List[String]): Future[Empty]
+  def updatePassword(email: String, password: String, token: Token)(newPassword: String): Future[Empty]
+  def updateEmail(email: String, password: String, token: Token)(newEmail: String): Future[Empty]
+  def deleteAccount(email: String, password: String, isSoftDelete: Boolean = true, token: Token): Future[Empty]
   def createSession(email: String, password: String): Future[Token]
-  def deleteSession(token: String): Future[Empty]
+  def deleteSession(sessionId: String): Future[Empty]
 }
